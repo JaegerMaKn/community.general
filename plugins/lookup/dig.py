@@ -386,14 +386,7 @@ class LookupModule(LookupBase):
 
                 continue
 
-            if '/' in t:
-                try:
-                    domain, qtype = t.split('/')
-                    domains.append(domain)
-                except Exception:
-                    domains.append(t)
-            else:
-                domains.append(t)
+            domains.append(t)
 
         # print "--- domain = {0} qtype={1} rdclass={2}".format(domain, qtype, rdclass)
 
@@ -416,7 +409,14 @@ class LookupModule(LookupBase):
 
         for domain in domains:
             try:
-                answers = myres.query(domain, qtype, rdclass=rdclass, tcp=tcp)
+                domain_qtype = qtype
+                if '/' in domain:
+                    try:
+                        domain, domain_qtype = domain.split('/')
+                    except Exception:
+                        pass
+
+                answers = myres.query(domain, domain_qtype, rdclass=rdclass, tcp=tcp)
                 for rdata in answers:
                     s = rdata.to_text()
                     if qtype.upper() == 'TXT':
